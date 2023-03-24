@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>MIDI Input Example</title>
+</head>
+<body>
+  <h1>MIDI Input Example</h1>
+  <ul id="midi-data"></ul>
+  
+  <script>
+    // Check for MIDI support in the browser
+    if (navigator.requestMIDIAccess) {
+      // Request access to MIDI devices
+      navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+    } else {
+      alert("No MIDI support in your browser.");
+    }
+    
+    // Called when MIDI devices are successfully accessed
+    function onMIDISuccess(midiAccess) {
+      console.log("MIDI ready!");
+      // Get the list of available MIDI input devices
+      var inputs = midiAccess.inputs;
+      // Set up event listeners for each input device
+      for (var input of inputs.values()) {
+        input.onmidimessage = onMIDIMessage;
+      }
+    }
+    
+    // Called when there is an error accessing MIDI devices
+    function onMIDIFailure() {
+      alert("Failed to access MIDI devices.");
+    }
+    
+    // Called when a MIDI message is received from an input device
+    function onMIDIMessage(event) {
+      var data = event.data;
+      // Extract the MIDI message type, channel, and value
+      var type = data[0] & 0xf0;
+      var channel = data[0] & 0x0f;
+      var value = data[1];
+      // Display the MIDI message in the UI
+      var listItem = document.createElement("li");
+      listItem.textContent = "Type: " + type + ", Channel: " + channel + ", Value: " + value;
+      document.getElementById("midi-data").appendChild(listItem);
+    }
+  </script>
+</body>
+</html>
